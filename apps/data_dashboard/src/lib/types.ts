@@ -33,6 +33,8 @@ export interface ESMarketYear {
 export interface DistressedCounty {
   county: string;
   region: string;
+  /** 5-digit US Census FIPS code, e.g. "06007" for Butte County */
+  fips: string;
 }
 
 export interface SourceLink {

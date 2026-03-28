@@ -1,8 +1,11 @@
 import { SectionHeader } from "@/components/SectionHeader";
 import { StatCard } from "@/components/StatCard";
 import { SourceCitation } from "@/components/SourceCitation";
+import { CaliforniaMapWrapper } from "@/components/CaliforniaMapWrapper";
 import {
   DISTRESSED_COUNTIES,
+  DISTRESSED_FIPS,
+  UNDERMARKETED_ZIPS,
   UNDERMARKETED_ZIP_COUNT,
   REGIONS,
   RULE_EXPLANATION,
@@ -48,45 +51,32 @@ export default function DistressedAreasPage() {
         />
       </div>
 
+      {/* Map */}
+      <div className="bg-white rounded-xl border border-stone-200 shadow-sm p-6 mb-8">
+        <h2 className="text-base font-semibold text-stone-800 mb-1">
+          California — Distressed Counties
+        </h2>
+        <p className="text-xs text-stone-400 mb-5">
+          Hover over a county for its name and designation. Boundaries from US Census Bureau (public domain).
+        </p>
+        <CaliforniaMapWrapper
+          distressedFips={DISTRESSED_FIPS}
+          undermarketedZips={UNDERMARKETED_ZIPS}
+        />
+      </div>
+
       {/* Rule explanation */}
       <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-8">
         <h3 className="font-semibold text-green-900 mb-2">The 85% Writing Rule</h3>
         <p className="text-sm text-green-800 leading-relaxed">{RULE_EXPLANATION}</p>
       </div>
 
-      {/* County tables by region */}
-      <h2 className="text-base font-semibold text-stone-800 mb-4">
-        Distressed Counties by Region
-      </h2>
-      <div className="grid sm:grid-cols-2 gap-4 mb-8">
-        {byRegion
-          .filter((r) => r.counties.length > 0)
-          .map(({ region, counties }) => (
-            <div key={region} className="bg-white rounded-xl border border-stone-200 shadow-sm p-4">
-              <h3 className="font-semibold text-stone-700 text-sm mb-3 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
-                {region}
-                <span className="ml-auto text-xs font-normal text-stone-400">
-                  {counties.length} {counties.length === 1 ? "county" : "counties"}
-                </span>
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {counties.map((c) => (
-                  <span
-                    key={c.county}
-                    className="text-xs bg-red-50 text-red-800 border border-red-100 px-2 py-1 rounded-md"
-                  >
-                    {c.county}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-      </div>
 
       {/* ZIP code context */}
       <div className="bg-stone-50 border border-stone-200 rounded-xl p-5 mb-6">
-        <h3 className="font-semibold text-stone-800 mb-2">~{UNDERMARKETED_ZIP_COUNT} Undermarketed ZIP Codes</h3>
+        <h3 className="font-semibold text-stone-800 mb-2">
+          ~{UNDERMARKETED_ZIP_COUNT} Undermarketed ZIP Codes
+        </h3>
         <p className="text-sm text-stone-600 leading-relaxed mb-3">
           In addition to the county-level designations, CDI has identified approximately{" "}
           {UNDERMARKETED_ZIP_COUNT} individual ZIP codes as &quot;undermarketed.&quot; A ZIP code qualifies if:
@@ -106,10 +96,9 @@ export default function DistressedAreasPage() {
       </div>
 
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-xs text-amber-700 leading-relaxed">
-        <strong>Verify before use:</strong> The county list above reflects the best available public
-        reporting as of March 2026. CDI publishes the authoritative list in a PDF document; confirm
-        the exact county composition against the source document linked below before using this data
-        for policy or business decisions.
+        <strong>Verify before use:</strong> The county list above reflects best available public
+        reporting as of March 2026. CDI publishes the authoritative list in the PDF linked below;
+        confirm the exact county composition before using this data for policy or business decisions.
       </div>
 
       <SourceCitation sources={SOURCES} dataAsOf="March 2025 CDI regulatory determination" />
