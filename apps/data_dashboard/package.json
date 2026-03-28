@@ -9,6 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit"
   },
+  "packageManager": "pnpm@9.15.9",
   "dependencies": {
     "next": "15.2.4",
     "react": "19.0.0",
