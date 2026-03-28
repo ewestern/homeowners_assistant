@@ -1,0 +1,129 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Category {
+  ENERGY_EFFICIENCY
+  DISASTER_RESILIENCE
+  WATER_CONSERVATION
+  SAFETY_AND_HEALTH
+  CLEAN_TRANSPORTATION
+  LAND_AND_ECOSYSTEM
+}
+
+enum Provider {
+  FEDERAL
+  STATE
+  LOCAL
+  UTILITY
+  INSURER
+}
+enum Delivery {
+  FEDERAL_TAX_CREDITS
+  STATE_TAX_DEDUCTIONS
+  UTILITY_REBATES
+  MUNICIPAL_GRANTS
+  INSURANCE_PREMIUM_DISCOUNTS
+  PACE_FINANCING
+  LOW_INTEREST_LOANS
+  PROPERTY_TAX_EXEMPTIONS
+  CASH_REBATE_PROGRAMS
+  FREE_SUBSIDIZED_INSTALLATION
+}
+
+enum ProgramStatus {
+  ACTIVE
+  INACTIVE
+  EXPIRED
+  UNVERIFIED
+}
+
+model Program {
+  id                String          @id @default(cuid())
+  name              String
+  slug              String          @unique
+  description       String
+  category          Category
+  subcategory       String?
+  provider          Provider
+  delivery          Delivery
+  providerName      String
+  url               String?
+  maxAmount         Float?
+  amountDescription String?
+  incomeRestricted  Boolean         @default(false)
+  deadline          DateTime?
+  isActive          Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  regions           ProgramRegion[]
+  actionSteps       ActionStep[]
+  checks            ProgramCheck[]
+
+  @@index([category])
+  @@index([isActive])
+  @@index([provider])
+}
+
+model Region {
+  id              String          @id @default(cuid())
+  country         String          @default("US")
+  state           String
+  county          String?
+  city            String?
+  zipCode         String?
+  utilityDistrict String?
+
+  programs        ProgramRegion[]
+
+  @@unique([state, county, city, zipCode])
+  @@index([state])
+  @@index([zipCode])
+}
+
+model ProgramRegion {
+  programId String
+  regionId  String
+
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  region    Region  @relation(fields: [regionId], references: [id], onDelete: Cascade)
+
+  @@id([programId, regionId])
+}
+
+model ActionStep {
+  id            String   @id @default(cuid())
+  programId     String
+  stepNumber    Int
+  title         String
+  description   String
+  estimatedTime String?
+  documents     String[]
+
+  program       Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([programId, stepNumber])
+  @@index([programId])
+}
+
+model ProgramCheck {
+  id         String        @id @default(cuid())
+  programId  String
+  checkedAt  DateTime      @default(now())
+  status     ProgramStatus
+  notes      String?
+
+  program    Program       @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@index([programId])
+  @@index([checkedAt])
+}
